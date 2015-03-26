@@ -11,6 +11,30 @@ exports.headers = headers = {
 };
 
 exports.serveAssets = function(res, asset, callback) {
+  fs.readFile(asset,function(err,file){
+    if(err){
+         //sice "/" off asset
+        fs.readFile(archive.paths.archivedSites + asset, function(err,file){
+            if(err){
+                console.log("ignore", err);
+                res.writeHead(404);
+                res.end();
+            } else {
+              console.log("getting file from archive");
+              res.writeHead(200);
+              res.end(file);
+
+            }
+          });
+
+    } else {
+      res.writeHead(200);
+      res.end(file);
+    }
+
+  })
+
+
   // Write some code here that helps serve up your static files!
   // (Static files are things like html (yours or archived from others...),
   // css, or anything that doesn't change often.)

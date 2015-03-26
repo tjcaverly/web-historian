@@ -10,6 +10,8 @@ var _ = require('underscore');
  */
 
 exports.paths = {
+  index: path.join(__dirname, '../web/public/index.html'),
+  css: path.join(__dirname, '../web/public/styles.css'),
   siteAssets: path.join(__dirname, '../web/public'),
   archivedSites: path.join(__dirname, '../archives/sites'),
   list: path.join(__dirname, '../archives/sites.txt')
@@ -34,7 +36,12 @@ exports.isUrlInList = function(){
 exports.addUrlToList = function(){
 };
 
-exports.isUrlArchived = function(){
+exports.isUrlArchived = function(url, cb){
+
+  fs.readFile(exports.paths.list, function (err, data){
+      cb(_.contains(data.toString().split("\n"), url))
+   });
+
 };
 
 exports.downloadUrls = function(){
