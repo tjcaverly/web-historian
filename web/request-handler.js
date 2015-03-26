@@ -2,6 +2,7 @@ var path = require('path');
 var archive = require('../helpers/archive-helpers');
 var url = require("url");
 var httpHelper = require("./http-helpers");
+var http = require('http');
 // require more modules/folders here!
 
 exports.handleRequest = function (req, res) {
@@ -9,13 +10,10 @@ exports.handleRequest = function (req, res) {
   if(req.method === "GET"){
     var pathname = url.parse(req.url).pathname;
     if(pathname === '/'){
-      httpHelper.serveAssets(res, archive.paths.index );
-    } else if (pathname === '/styles.css') {
-      httpHelper.serveAssets(res, archive.paths.css );
+      pathname = "/index.html";
     }
-    else{
-      httpHelper.serveAssets(res, pathname);
-    }
+    httpHelper.serveAssets(res, pathname);
+
   } else if(req.method === "POST") {
     var buffer = '';
     req.on('data', function(data) {
@@ -23,27 +21,28 @@ exports.handleRequest = function (req, res) {
     })
     req.on('end', function(){
       var theUrl = buffer.slice(4);
-      archive.addUrlToList(theUrl);
-      archive.isUrlArchived(theUrl, function(isArchived){
-        if (isArchived) {
-          // console.log(archive.paths.sites);
+
+      archive.isUrlInList(theUrl, function(isInList) {
+        if ( !isInList ) {
+          archive.addUrlToList(theUrl);
+        }
+      });
+
+      archive.isUrlArchived(theUrl, function(isInArchive) {
+        if (!isInArchive) {
+          console.log("loading");
           res.writeHead(302, {
-            'Location':archive.paths.archivedSites + '/' + theUrl
-          });
-        res.end();
-        } else {
-          archive.downloadUrl(theUrl, function(){});
-          res.writeHead(302, {
-            'Location':archive.paths.siteAssets + '/loading.html'
+            'Location':'/loading.html'
           });
           res.end();
-
+        } else {
+          res.writeHead(302, {
+            'Location':'/' + theUrl
+          });
+          res.end();
         }
-      })
+      });
 
-    } );
-
-
-  }
-  //res.end(archive.paths.list);
+      });
+    }
 };

@@ -54,12 +54,6 @@ exports.isUrlArchived = function(url, cb){
     fs.readdir(exports.paths.archivedSites, function(err, files) {
       cb(_.contains(files, url));
     } )
-
-
-  // fs.readFile(exports.paths.list, function (err, data){
-  //     cb(_.contains(data.toString().split("\n"), url))
-  //  });
-
 };
 
 exports.downloadUrl = function(url, cb) {
@@ -82,6 +76,8 @@ exports.downloadUrls = function(urlArray){
 
     _.each(urlArray, function(url){
       console.log(url);
-      exports.downloadUrl(url);
+      if (url.length>0){
+        exports.downloadUrl(url);
+      }
     });
 };
