@@ -23,12 +23,23 @@ exports.handleRequest = function (req, res) {
     })
     req.on('end', function(){
       var theUrl = buffer.slice(4);
-      archive.addUrlToList(theUrl, function(){
-        res.writeHead(302, {
-          'Location':archive.paths.siteAssets + '/loading.html'
-        });
+      archive.addUrlToList(theUrl);
+      archive.isUrlArchived(theUrl, function(isArchived){
+        if (isArchived) {
+          // console.log(archive.paths.sites);
+          res.writeHead(302, {
+            'Location':archive.paths.archivedSites + '/' + theUrl
+          });
         res.end();
-      });
+        } else {
+          archive.downloadUrl(theUrl, function(){});
+          res.writeHead(302, {
+            'Location':archive.paths.siteAssets + '/loading.html'
+          });
+          res.end();
+
+        }
+      })
 
     } );
 
