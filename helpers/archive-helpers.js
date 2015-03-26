@@ -33,7 +33,12 @@ exports.readListOfUrls = function(){
 exports.isUrlInList = function(){
 };
 
-exports.addUrlToList = function(){
+exports.addUrlToList = function(url, cb){
+  fs.appendFile(exports.paths.list, url+'\n', function(err) {
+    if (!err){
+      cb(url);
+    }
+  });
 };
 
 exports.isUrlArchived = function(url, cb){

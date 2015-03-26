@@ -16,6 +16,23 @@ exports.handleRequest = function (req, res) {
     else{
       httpHelper.serveAssets(res, pathname);
     }
+  } else if(req.method === "POST") {
+    var buffer = '';
+    req.on('data', function(data) {
+      buffer += data;
+    })
+    req.on('end', function(){
+      var theUrl = buffer.slice(4);
+      archive.addUrlToList(theUrl, function(){
+        res.writeHead(302, {
+          'Location':archive.paths.siteAssets + '/loading.html'
+        });
+        res.end();
+      });
+
+    } );
+
+
   }
   //res.end(archive.paths.list);
 };
